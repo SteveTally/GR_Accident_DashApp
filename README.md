@@ -3,10 +3,13 @@ The purpose of this app is to test deployment of a Plotly Dash
 app on AWS Elastic Beanstalk with Snwoflake database back end.  Each interaction
 triggers a query to retreive aggregate data from a Snowflake data warehouse.
 
+Application URL:
+http://dashapp-env.eba-rpkspm7n.us-east-1.elasticbeanstalk.com
+
 ##### Database Credentials
 To avoid embedding credentials in code, they are stored in OS environment variables.
-These variables are configured AWS Elastic Beanstalk environment through the web interface.
-For local development, use the following to set enviromnet variables:
+These variables are configured in the AWS Elastic Beanstalk environment configuration software category.
+For local development, use the following code to set enviromnet variables:
 
 os.environ['SNOWFLAKE_USER'] = 'USERNAME'
 os.environ['SNOWFLAKE_PWD'] = 'PASSWORD'

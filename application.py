@@ -139,9 +139,9 @@ app.title='GR Crash Data Viz'
 app.layout = html.Div([
     dcc.Markdown('''
 ### Grand Rapids Traffic Accident Heatmap
-This data visualization highlights paterns in traffic accidents in the city of Grand Rapids, Michigan.
+This data visualization highlights patterns in traffic accidents in the city of Grand Rapids, Michigan.
 Data used in this visualization is publically available from [GRData](https://grdata-grandrapids.opendata.arcgis.com/datasets/cgr-crash-data)
-. This is an incredibly rich dataset with detailed information for 74,309 traffic accidents logged between 2007 and 2018.  
+. This incredibly rich dataset includes detailed information for 74,309 traffic accidents logged between 2007 and 2017.  
 
 ##### Explore relationships between variables and accident counts
 Use dropdowns below to explore relationships between age, week of year, day of week, and hour of day.  Click on a square to show accident locations on the map below.
@@ -171,7 +171,7 @@ Use dropdowns below to explore relationships between age, week of year, day of w
                     {'label': 'Day of Week', 'value': 'Day of Week'},
                     {'label': 'Hour of Day', 'value': 'Hour of Day'}
                 ],
-                value='Day of Week',
+                value='Hour of Day',
                 clearable=False
                 
             )
@@ -182,7 +182,7 @@ Use dropdowns below to explore relationships between age, week of year, day of w
     dcc.Graph(id='crosstab'),
     dcc.Markdown('''
             ##### Where are these accidents happening?
-            Click a square on the heatmap above to see accident locations the map below.
+            Click a square on the heatmap above to see accident locations on the map below
             '''),
     
     dcc.Graph(id='map-plot')
