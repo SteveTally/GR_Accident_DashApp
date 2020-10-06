@@ -1,10 +1,10 @@
 ### Grand Rapids Accident Data Viz
 The purpose of this app is to test deployment of a Plotly Dash 
-app on AWS Elastic Beanstalk with Snwoflake database back end.  Each interaction
-triggers a query to retreive aggregate data from a Snowflake data warehouse.
+app on AWS Elastic Beanstalk with Snwoflake database connection.  Each interaction
+triggers a query to retreive aggregate data from a Snowflake database.
 
 Application URL:
-http://dashapp-env.eba-rpkspm7n.us-east-1.elasticbeanstalk.com
+http://grcrash.swtally.com/
 
 ##### Database Credentials
 To avoid embedding credentials in code, they are stored in OS environment variables.

@@ -7,6 +7,8 @@ import plotly_express as px
 import snowflake.connector
 import os
 
+#TODO: Find a better way to check if DB connection times out and re-establish 
+
 
 #############################
 ## Calculation Settings     
@@ -57,7 +59,7 @@ def GetCrosstabData(conn,x_dimension,y_dimension):
     # Build SQL statement and insert X / Y axis code
     sql = """
     SELECT
-    count(X) As Count,
+    count(X) As COUNT,
     {} As X_AXIS,
     {} As Y_AXIS
     
@@ -89,7 +91,7 @@ def GetSpatialBins(conn,
      # Vuild SQL statement and insert X / Y axis code
     sql = """
     SELECT
-    count(X) As Count,
+    count(X) As COUNT,
     round(Y/2,3)*2 As LAT_BIN,
     round(X/2,3)*2 As LON_BIN
 
@@ -123,8 +125,8 @@ def GetSpatialBins(conn,
 #########################
 
 # Open Database Conection
-conn = SnowDBConnect()
-
+db_connection = SnowDBConnect()
+ 
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
@@ -198,8 +200,15 @@ Use dropdowns below to explore relationships between age, week of year, day of w
 [Input('x_axis_dimension', 'value'),
  Input('y_axis_dimension', 'value')])
 def update_heatmap(x_axis_dimension, y_axis_dimension):
-    # Query data
-    crosstab_data = GetCrosstabData(conn,
+    global db_connection
+    # Query data.  If query fails then re-open connecton and try again
+    try:
+        crosstab_data = GetCrosstabData(db_connection,
+                                    x_dimension = x_axis_dimension,
+                                    y_dimension = y_axis_dimension)
+    except:
+        db_connection = SnowDBConnect()
+        crosstab_data = GetCrosstabData(db_connection,
                                     x_dimension = x_axis_dimension,
                                     y_dimension = y_axis_dimension)
     
@@ -240,7 +249,8 @@ def update_map(clickData, x_axis_dimension, y_axis_dimension):
     
     if clickData: # if the user has clicked the heatmap then
         #query map data
-        spatial_data = GetSpatialBins(conn,
+
+        spatial_data = GetSpatialBins(db_connection,
                                   x_filter =clickData['points'][0]['x'],
                                   y_filter = clickData['points'][0]['y'],
                                   x_dimension = x_axis_dimension,
