@@ -4,15 +4,15 @@ app on AWS Elastic Beanstalk with Snwoflake database connection.  Each interacti
 triggers a query to retreive aggregate data from a Snowflake database.
 
 Application URL:
-http://grcrash.swtally.com/
+https://grcrash.swtally.com/
 
 ##### Database Credentials
 To avoid embedding credentials in code, they are stored in OS environment variables.
 These variables are configured in the AWS Elastic Beanstalk environment configuration software category.
 For local development, use the following code to set enviromnet variables:
 
-os.environ['SNOWFLAKE_USER'] = 'USERNAME'
-os.environ['SNOWFLAKE_PWD'] = 'PASSWORD'
+os.environ['SNOWFLAKE_USER'] = 'USERNAME'  
+os.environ['SNOWFLAKE_PWD'] = 'PASSWORD'  
 os.environ['SNOWFLAKE_WAREHOUSE'] = 'WAREHOUSE NAME'
 
 

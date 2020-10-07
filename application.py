@@ -35,10 +35,13 @@ dimension_limits = {'Hour of Day':24,
 
 # Open Connection
 def SnowDBConnect():
+    
+    # read credentials from OS enviroment variables
     SNOWFLAKE_USER = os.environ['SNOWFLAKE_USER']
     SNOWFLAKE_PWD = os.environ['SNOWFLAKE_PWD']
     SNOWFLAKE_WAREHOUSE = os.environ['SNOWFLAKE_WAREHOUSE']
     
+    # open DB connection
     conn = snowflake.connector.connect(
               user= SNOWFLAKE_USER ,
               password=SNOWFLAKE_PWD,
@@ -88,7 +91,7 @@ def GetSpatialBins(conn,
     x_filter_string = sql_formulas.get(x_dimension)+" = "+str(x_filter)
     y_filter_string = sql_formulas.get(y_dimension)+" = "+str(y_filter)
     
-     # Vuild SQL statement and insert X / Y axis code
+     # Build SQL statement and insert X / Y axis code
     sql = """
     SELECT
     count(X) As COUNT,
@@ -127,7 +130,7 @@ def GetSpatialBins(conn,
 # Open Database Conection
 db_connection = SnowDBConnect()
  
-
+# Initialize app server
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 application = app.server
@@ -216,13 +219,17 @@ def update_heatmap(x_axis_dimension, y_axis_dimension):
     x_axis_limit = dimension_limits.get(x_axis_dimension)
     y_axis_limit = dimension_limits.get(y_axis_dimension) 
     
-    # Apply value range limits
+    # apply value range limits
     crosstab_data = crosstab_data.query("X_AXIS <= @x_axis_limit and Y_AXIS <= @y_axis_limit")
     
+    # reshape data
+    crosstab_data = crosstab_data.pivot(index='Y_AXIS',
+                                        columns='X_AXIS',
+                                        values='COUNT').fillna(0)
+    
+    
     # create heatmap    
-    crosstab_plot = px.imshow(crosstab_data.pivot(index='Y_AXIS',
-                                                  columns='X_AXIS',
-                                                  values='COUNT').fillna(0),
+    crosstab_plot = px.imshow(crosstab_data,
                               color_continuous_scale='Sunset',
                               aspect = 'auto',
                               range_color=(crosstab_data.to_numpy().min()
@@ -234,7 +241,6 @@ def update_heatmap(x_axis_dimension, y_axis_dimension):
     crosstab_plot.layout.coloraxis.showscale = False
     # reduce padding
     crosstab_plot.update_layout(margin=dict(l=20, r=20, t=10, b=0))
-    
 
     return crosstab_plot
 
@@ -249,7 +255,6 @@ def update_map(clickData, x_axis_dimension, y_axis_dimension):
     
     if clickData: # if the user has clicked the heatmap then
         #query map data
-
         spatial_data = GetSpatialBins(db_connection,
                                   x_filter =clickData['points'][0]['x'],
                                   y_filter = clickData['points'][0]['y'],
@@ -268,10 +273,16 @@ def update_map(clickData, x_axis_dimension, y_axis_dimension):
                                 zoom=10)
         # change setting to preserve map zoom and center on update
         map_plot.update_layout(uirevision = True)
-    else: # If no data is selected then build a blank map
-        map_plot = px.scatter_mapbox(pd.DataFrame(data={'LAT': [42.96],
-                                                    'LON': [-85.67],
-                                                  'COUNT': [5]}),
+        
+    else: # If no data is selected then build a blank placeholder map to return
+        #TODO: There must be a better way to create a blank maps\
+    
+        # single point dataframe for placeholder map
+        sample_data = pd.DataFrame(data={'LAT': [42.96],
+                                         'LON': [-85.67],
+                                         'COUNT': [5]})
+        # Build blank placeholder map
+        map_plot = px.scatter_mapbox(sample_data,
                                      lat='LAT',
                                      lon='LON',
                                      color='COUNT',
